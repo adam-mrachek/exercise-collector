@@ -1,0 +1,7 @@
+<% @exercises.each do |exercise| %>
+  <ul>
+    <li><a href="/exercises/<%= exercise["id"] %>"><%= exercise["name"] %></a></li>
+  </ul>
+<% end %>
+
+<a href="/exercises/new">Add new exercise</a>
