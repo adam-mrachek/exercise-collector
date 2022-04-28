@@ -12,7 +12,7 @@ class Exercise
     @db.exec_params(statement, params)
   end
 
-  def all_exercises
+  def all
     sql = <<~SQL
       SELECT * FROM exercises;
     SQL
@@ -20,7 +20,7 @@ class Exercise
     query(sql)
   end
 
-  def find_exercise(id)
+  def find(id)
     sql = <<~SQL
       SELECT * FROM exercises
       WHERE id = $1
@@ -29,12 +29,36 @@ class Exercise
     query(sql, id).first
   end
 
-  def add_exercise(exercise_name)
+  def add(exercise_name)
     sql = <<~SQL
       INSERT INTO exercises (name)
       VALUES ($1)
+      RETURNING id;
     SQL
 
-    query(sql, exercise_name)
+    result = query(sql, exercise_name)
+    binding.pry
+  end
+
+  def add_equipment(exercise_id, *equipment)
+    sql = <<~SQL
+      INSERT INTO equipment_exercises (equipment_id, exercise_id)
+      VALUES ($1, $2);
+    SQL
+
+    equipment.each do |equip|
+      query(sql, [id, equip["id"]])
+    end
+  end
+
+  def add_muscle_groups(exercise_id, *muscle_groups)
+    sql = <<~SQL
+      INSERT INTO exercises_muscle_groups (exercise_id, muscle_group_id)
+      VALUES ($1, $2);
+    SQL
+
+    muscle_groups.each do |muscle_group|
+      query(sql, [id, muscle_group["id"]])
+    end
   end
 end

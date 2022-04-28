@@ -1,5 +1,31 @@
 <form action="/exercises" method="post">
   <label for="exercise_name">Enter the exercise name:</label>
+  <br><br>
   <input type="text" name="exercise_name" placeholder="List Name">
+
+  <p>Select primary body parts targeted:</p>
+
+  <fieldset>
+    <legend>Select the primary body parts targeted:</legend>
+
+    <% @all_muscle_groups.each do |muscle_group| %>
+      <div>
+        <input type="checkbox" id="<%= muscle_group["id"] %>" name="muscle_groups[]" value="<%= muscle_group["id"] %>">
+        <label for="<%= muscle_group["name"] %>"><%= muscle_group["name"] %></label>
+      </div>
+    <% end %>
+  </fieldset>
+
+  <fieldset>
+    <legend>Select the equipment required:</legend>
+
+    <% @all_equipment.each do |equipment| %>
+      <div>
+        <input type="checkbox" id="<%= equipment["id"] %>" name="equipment[]" value="<%= equipment["id"] %>">
+        <label for="<%= equipment["name"] %>"><%= equipment["name"] %></label>
+      </div>
+    <% end %>
+  </fieldset>
+
   <input type="submit" value="Add Exercise">
 </form>
