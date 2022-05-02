@@ -1,7 +1,15 @@
+<header>
+  <h1>My Exercises</h1>
+</header>
+
 <% @exercises.each do |exercise| %>
   <ul>
     <li><a href="/exercises/<%= exercise["id"] %>"><%= exercise["name"] %></a></li>
   </ul>
 <% end %>
 
-<a href="/exercises/new">Add new exercise</a>
+<p><a href="/exercises/new">Add new exercise</a></p>
+
+<p><a href="/muscle_groups/new">Add new muscle group</a></p>
+
+<p><a href="/equipment/new">Add new equipment</a></p>

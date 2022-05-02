@@ -1,1 +1,25 @@
-<h1><%= @exercise["name"] %></h1>
+<header>
+  <h1><%= @exercise["name"] %></h1>
+</header>
+
+<p>Muscle Groups Worked:</p>
+<ul>
+  <% @muscle_groups.each do |muscle_group| %>
+  <li><%= muscle_group["name"] %></li>
+  <% end %>
+</ul>
+
+<p>Equipment Required:</p>
+<ul>
+  <% @equipment.each do |piece| %>
+  <li><%= piece["name"] %></li>
+  <% end %>
+</ul>
+
+<a href="/exercises/<%= @exercise_id %>/edit">Edit Exercise</a>
+
+<br><br>
+
+<form action="/exercises/<%= @exercise_id %>/delete" method="post">
+  <button type="submit">Delete Exercise</button>
+</form>
