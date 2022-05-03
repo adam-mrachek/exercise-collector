@@ -1,0 +1,13 @@
+<h1>Exercises for <%= @muscle["name"] %></h1>
+
+<ul>
+  <% @exercises.each do |exercise| %>
+    <li><a href="/exercises/<%= exercise["id"] %>"><%= exercise["name"] %></a></li>
+  <% end %>
+</ul>
+
+<p><a href="/muscles/<%= @muscle["id"] %>/edit">Edit Muscle</a></p>
+
+<form action="/muscles/<%= @muscle["id"] %>/delete" method="post">
+  <button type="submit">Delete Muscle</button>
+</form>

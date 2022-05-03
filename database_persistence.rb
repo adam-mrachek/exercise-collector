@@ -28,7 +28,7 @@ class DatabasePersistence
     query(sql)
   end
 
-  def all_muscle_groups
+  def all_muscles
     sql = <<~SQL
       SELECT * FROM muscle_groups;
     SQL
@@ -45,6 +45,24 @@ class DatabasePersistence
     query(sql, id).first
   end
 
+  def find_equipment(id)
+    sql = <<~SQL
+      SELECT * FROM equipment
+      WHERE id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
+  def find_muscle(id)
+    sql = <<~SQL
+      SELECT * FROM muscle_groups
+      WHERE id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
   def add_exercise(exercise_name, equipment_ids, muscle_group_ids)
     sql = <<~SQL
       INSERT INTO exercises (name)
@@ -55,12 +73,12 @@ class DatabasePersistence
     result = query(sql, exercise_name)
     exercise_id = result.first["id"].to_i
 
-    add_equipment(exercise_id, equipment_ids)
-    add_muscle_groups(exercise_id, muscle_group_ids)
+    add_equipment_exercises(exercise_id, equipment_ids)
+    add_muscle_groups_exercises(exercise_id, muscle_group_ids)
     result
   end
 
-  def add_equipment(exercise_id, equipment)
+  def add_equipment_exercises(exercise_id, equipment)
     sql = <<~SQL
       INSERT INTO exercises_equipment (equipment_id, exercise_id)
       VALUES ($1, $2);
@@ -71,7 +89,7 @@ class DatabasePersistence
     end
   end
 
-  def add_muscle_groups(exercise_id, muscle_groups)
+  def add_muscle_groups_exercises(exercise_id, muscle_groups)
     sql = <<~SQL
       INSERT INTO exercises_muscle_groups (exercise_id, muscle_group_id)
       VALUES ($1, $2);
@@ -92,16 +110,27 @@ class DatabasePersistence
     query(sql, new_name, id)
   end
 
-  def delete_exercise(id)
+  def update_muscle(id, new_name)
     sql = <<~SQL
-      DELETE FROM exercises
-      WHERE id = $1;
+      UPDATE muscle_groups
+      SET name = $1
+      WHERE id = $2;
     SQL
 
-    query(sql, id)
+    query(sql, new_name, id)
   end
 
-  def exercise_equipment(id)
+  def update_equipment(id, new_name)
+    sql = <<~SQL
+      UPDATE equipment
+      SET name = $1
+      WHERE id = $2;
+    SQL
+
+    query(sql, new_name, id)
+  end
+
+  def get_equipment_for_exercises(id)
     sql = <<~SQL
       SELECT equipment.name
       FROM equipment
@@ -138,12 +167,67 @@ class DatabasePersistence
     query(sql, name)
   end
 
-  def add_muscle_groups(name)
+  def add_muscle(name)
     sql = <<~SQL
       INSERT INTO muscle_groups (name)
       VALUES ($1);
     SQL
 
     query(sql, name)
+  end
+
+  def get_exercises_for_equipment(id)
+    sql = <<~SQL
+      SELECT exercises.name, exercises.id
+      FROM exercises
+      JOIN exercises_equipment
+        ON exercises.id = exercises_equipment.exercise_id
+      JOIN equipment
+        ON equipment.id = exercises_equipment.equipment_id
+      WHERE equipment.id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
+  def get_exercises_for_muscle(id)
+    sql = <<~SQL
+      SELECT exercises.name, exercises.id
+      FROM exercises
+      JOIN exercises_muscle_groups
+        ON exercises.id = exercises_muscle_groups.exercise_id
+      JOIN muscle_groups
+        ON muscle_groups.id = exercises_muscle_groups.muscle_group_id
+      WHERE muscle_groups.id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
+  def delete_exercise(id)
+    sql = <<~SQL
+      DELETE FROM exercises
+      WHERE id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
+  def delete_equipment(id)
+    sql = <<~SQL
+      DELETE FROM equipment
+      WHERE id = $1;
+    SQL
+
+    query(sql, id)
+  end
+
+  def delete_muscle(id)
+    sql = <<~SQL
+      DELETE FROM muscle_groups
+      WHERE id = $1;
+    SQL
+
+    query(sql, id)
   end
 end

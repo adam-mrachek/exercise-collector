@@ -1,0 +1,9 @@
+<h1>All Muscle Groups</h1>
+
+<ul>
+  <% @muscles.each do |muscle| %>
+    <li><a href="/muscles/<%= muscle["id"] %>"><%= muscle["name"] %></a></li>
+  <% end %>
+</ul>
+
+<p><a href="/muscles/new">Add new muscle</a></p>

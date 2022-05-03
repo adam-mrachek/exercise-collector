@@ -1,0 +1,7 @@
+
+<form action="/muscles/<%= @muscle["id"] %>" method="post">
+  <input type="hidden" name="_method" value="patch">
+  <label for="muscle_name">Enter a new name for the muscle:</label>
+  <input type="text" name="muscle_name" value="<%= @muscle["name"] %>">
+  <button type="submit">Update</button>
+</form>

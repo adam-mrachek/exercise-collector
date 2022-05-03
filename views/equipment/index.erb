@@ -1,0 +1,9 @@
+<h1>Equipment</h1>
+
+<ul>
+  <% @equipment.each do |equip| %>
+    <li><a href="/equipment/<%= equip["id"] %>"><%= equip["name"] %></a></li>
+  <% end %>
+</ul>
+
+<p><a href="/equipment/new">Add new equipment</a></p>
