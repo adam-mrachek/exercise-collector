@@ -70,12 +70,12 @@ class DatabasePersistence
       RETURNING id;
     SQL
 
-    result = query(sql, exercise_name)
-    exercise_id = result.first["id"].to_i
-
-    add_equipment_exercises(exercise_id, equipment_ids)
-    add_muscle_groups_exercises(exercise_id, muscle_group_ids)
-    result
+    begin
+      result = query(sql, exercise_name)
+      result.first
+    rescue PG::UniqueViolation => e
+      e.class.name
+    end
   end
 
   def add_equipment_exercises(exercise_id, equipment)

@@ -4,10 +4,16 @@ require "sinatra"
 
 require_relative "database_persistence"
 
+configure do
+  enable :sessions
+  set :sessions_secret, 'secret'
+  set :erb, :escape_html => true
+end
+
 configure(:development) do
   require 'pry'
   require 'sinatra/reloader'
-  also_reload "exercise.rb"
+  also_reload "database_persistence.rb"
 end
 
 before do
@@ -49,9 +55,19 @@ post '/exercises' do
   exercise_name = params[:exercise_name].strip
   equipment_ids = params[:equipment].map(&:to_i)
   muscle_group_ids = params[:muscle_groups].map(&:to_i)
-  new_exercise = @db.add_exercise(exercise_name, equipment_ids, muscle_group_ids)
 
-  redirect '/'
+  result = @db.add_exercise(exercise_name, equipment_ids, muscle_group_ids)
+
+  if result == "PG::UniqueViolation"
+    session[:error] = "#{exercise_name} already exists"
+    @all_equipment = @db.all_equipment
+    @all_muscle_groups = @db.all_muscles
+    erb :"exercises/new"
+  else
+    @db.add_equipment_exercises(result["id"].to_i, equipment_ids)
+    @db.add_muscle_groups_exercises(result["id"].to_i, equipment_ids)
+    redirect '/'
+  end
 end
 
 patch '/exercises/:id' do
