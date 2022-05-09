@@ -20,6 +20,12 @@ before do
   @db = DatabasePersistence.new(logger)
 end
 
+def error_for_name(name)
+  if !(1..100).cover?(name.size)
+    "Name must be between 1 and 100 characters."
+  end
+end
+
 get '/' do
   redirect '/exercises'
 end
@@ -56,17 +62,21 @@ post '/exercises' do
   equipment_ids = params[:equipment].map(&:to_i)
   muscle_group_ids = params[:muscle_groups].map(&:to_i)
 
-  result = @db.add_exercise(exercise_name, equipment_ids, muscle_group_ids)
-
-  if result == "PG::UniqueViolation"
-    session[:error] = "#{exercise_name} already exists"
-    @all_equipment = @db.all_equipment
-    @all_muscle_groups = @db.all_muscles
-    erb :"exercises/new"
+  if (error = error_for_name(exercise_name))
+    session[:error] = error
+    redirect '/exercises/new'
   else
-    @db.add_equipment_exercises(result["id"].to_i, equipment_ids)
-    @db.add_muscle_groups_exercises(result["id"].to_i, equipment_ids)
-    redirect '/'
+    result = @db.add_exercise(exercise_name)
+    
+    if result == "PG::UniqueViolation"
+      session[:error] = "#{exercise_name} already exists"
+      redirect '/exercises/new'
+    else
+      exercise_id = result.first.to_i
+      @db.add_equipment_exercises(exercise_id, equipment_ids)
+      @db.add_muscle_groups_exercises(exercise_id, equipment_ids)
+      redirect '/'
+    end
   end
 end
 
@@ -111,14 +121,25 @@ get '/equipment/:id' do
 end
 
 post '/equipment' do
-  equipment_name = params[:equipment_name]
-  @db.add_equipment(equipment_name)
+  equipment_name = params[:equipment_name].strip
 
-  redirect '/equipment'
+  if (error = error_for_name(equipment_name))
+    session[:error] = error
+    erb :"equipment/new"
+  else
+    result = @db.add_equipment(equipment_name)
+
+    if result == "PG::UniqueViolation"
+      session[:error] = "#{equipment_name} already exists"
+      erb :"equipment/new"
+    else
+      redirect '/equipment'
+    end
+  end
 end
 
 patch '/equipment/:id' do
-  new_name = params[:equipment_name]
+  new_name = params[:equipment_name].strip
   equipment_id = params[:id].to_i
   @db.update_equipment(equipment_id, new_name)
 
@@ -159,14 +180,25 @@ get '/muscles/:id' do
 end
 
 post '/muscles' do
-  muscle_name = params[:muscle_name]
-  @db.add_muscle(muscle_name)
+  muscle_name = params[:muscle_name].strip
 
-  redirect '/muscles'
+  if (error = error_for_name(muscle_name))
+    session[:error] = error
+    erb :"muscles/new"
+  else
+    result = @db.add_muscle(muscle_name)
+  
+    if result == "PG::UniqueViolation"
+      session[:error] = "#{muscle_name} already exists"
+      erb :"muscles/new"
+    else
+      redirect '/muscles'
+    end
+  end
 end
 
 patch '/muscles/:id' do
-  new_name = params[:muscle_name]
+  new_name = params[:muscle_name].strip
   muscle_id = params[:id].to_i
   @db.update_muscle(muscle_id, new_name)
 

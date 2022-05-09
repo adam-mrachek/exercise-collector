@@ -1,7 +1,7 @@
 <form action="/exercises/<%= @exercise_id %>" method="post">
   <input type="hidden" name="_method" value="patch">
   <label for="exercise_name">Enter a new name for the exercise:</label>
-  <input type="text" name="exercise_name" value="<%= @exercise["name"] %>" >
+  <input type="text" name="exercise_name" value="<%= @exercise["name"] %>" required>
   <input type="submit" value="Update Exercise">
   <a href="/exercises/<%= @exercise_id %>">Cancel</a>
 </form>

@@ -63,7 +63,7 @@ class DatabasePersistence
     query(sql, id)
   end
 
-  def add_exercise(exercise_name, equipment_ids, muscle_group_ids)
+  def add_exercise(exercise_name)
     sql = <<~SQL
       INSERT INTO exercises (name)
       VALUES ($1)
@@ -71,8 +71,7 @@ class DatabasePersistence
     SQL
 
     begin
-      result = query(sql, exercise_name)
-      result.first
+      query(sql, exercise_name)
     rescue PG::UniqueViolation => e
       e.class.name
     end
@@ -164,7 +163,11 @@ class DatabasePersistence
       VALUES ($1);
     SQL
 
-    query(sql, name)
+    begin
+      query(sql, name)
+    rescue PG::UniqueViolation => e
+      e.class.name
+    end
   end
 
   def add_muscle(name)
@@ -173,7 +176,11 @@ class DatabasePersistence
       VALUES ($1);
     SQL
 
-    query(sql, name)
+    begin
+      query(sql, name)
+    rescue PG::UniqueViolation => e
+      e.class.name
+    end
   end
 
   def get_exercises_for_equipment(id)
