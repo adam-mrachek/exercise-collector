@@ -1,4 +1,5 @@
 require 'pg'
+require 'bcrypt'
 require 'pry'
 
 class DatabasePersistence
@@ -10,6 +11,27 @@ class DatabasePersistence
   def query(statement, *params)
     @logger.info "#{statement}: #{params}"
     @db.exec_params(statement, params)
+  end
+
+  def create_account(name, password)
+    sql = <<~SQL
+      INSERT INTO accounts (name, password)
+      VALUES ($1, $2)
+      RETURNING id;
+    SQL
+
+    hashed_password = BCrypt::Password.create(password)
+
+    query(sql, name, hashed_password)
+  end
+
+  def find_account_by_name(name)
+    sql = <<~SQL
+      SELECT * FROM accounts
+      WHERE name = $1;
+    SQL
+
+    query(sql, name)
   end
 
   def all_exercises

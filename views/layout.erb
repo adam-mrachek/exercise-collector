@@ -23,6 +23,15 @@
   <main>
     <%= yield %>
     <p><a href="/">Home</a></p>
+
+    <% if signed_in? %>
+      <form action="/accounts/signout" method="post">
+        <p>Signed in as <%= session[:username] %></p>
+        <button type="submit">Sign Out</button>
+      </form>
+    <% else %>
+      <p><a href="/accounts/signin">Sign In</a></p>
+    <% end %>
   </main>
 </body>
 </html>

@@ -1,3 +1,9 @@
+CREATE TABLE accounts (
+  id serial PRIMARY KEY,
+  name text NOT NULL UNIQUE,
+  password varchar(60) NOT NULL
+);
+
 CREATE TABLE exercises (
   id serial PRIMARY KEY,
   name text NOT NULL UNIQUE
