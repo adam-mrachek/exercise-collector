@@ -115,7 +115,7 @@ class DatabasePersistence
       INSERT INTO exercises_muscle_groups (exercise_id, muscle_group_id)
       VALUES ($1, $2);
     SQL
-
+    
     muscle_groups.each do |muscle_group|
       query(sql, exercise_id, muscle_group)
     end

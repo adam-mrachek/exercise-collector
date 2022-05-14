@@ -168,9 +168,9 @@ post '/exercises' do
       session[:error] = "#{exercise_name} already exists"
       redirect '/exercises/new'
     else
-      exercise_id = result.first.to_i
+      exercise_id = result.first["id"].to_i
       @db.add_equipment_exercises(exercise_id, equipment_ids)
-      @db.add_muscle_groups_exercises(exercise_id, equipment_ids)
+      @db.add_muscle_groups_exercises(exercise_id, muscle_group_ids)
       redirect '/'
     end
   end
